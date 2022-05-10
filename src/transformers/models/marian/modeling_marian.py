@@ -44,7 +44,7 @@ from ...utils import (
 )
 from .configuration_marian import MarianConfig
 
-
+from torch.nn.parameter import Parameter
 logger = logging.get_logger(__name__)
 
 _CONFIG_FOR_DOC = "MarianConfig"
@@ -663,6 +663,14 @@ class MarianEncoder(MarianPreTrainedModel):
             self.embed_tokens = embed_tokens
         else:
             self.embed_tokens = nn.Embedding(config.vocab_size, embed_dim, self.padding_idx)
+        # if USE_DEBIASED:
+        old_num_tokens, old_embedding_dim = self.embed_tokens.weight.size()
+        new_embeddings = nn.Embedding(old_num_tokens, old_embedding_dim)
+        new_embeddings.to(self.embed_tokens.weight.device, dtype=self.embed_tokens.weight.dtype)
+        self._init_weights(new_embeddings)
+        new_embeddings.weight.data = Parameter(torch.rand(old_num_tokens, old_embedding_dim))
+        self.a = new_embeddings
+        # self.set_input_embeddings(new_embeddings)
 
         self.embed_positions = MarianSinusoidalPositionalEmbedding(
             config.max_position_embeddings, embed_dim, self.padding_idx
@@ -742,7 +750,10 @@ class MarianEncoder(MarianPreTrainedModel):
         else:
             raise ValueError("You have to specify either input_ids or inputs_embeds")
 
+        ### comment: this is where i chenge the embedding table
+        # self.set_input_embeddings(self.a)
         if inputs_embeds is None:
+
             inputs_embeds = self.embed_tokens(input_ids) * self.embed_scale
 
         embed_pos = self.embed_positions(input_shape)
