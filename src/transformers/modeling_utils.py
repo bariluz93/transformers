@@ -2021,6 +2021,7 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin, GenerationMixin, PushToHubMix
                     model = cls(config, *model_args, **model_kwargs)
         else:
             with no_init_weights(_enable=_fast_init):
+                ### comment: step 5
                 model = cls(config, *model_args, **model_kwargs)
 
         if from_tf:
