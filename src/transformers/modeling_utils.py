@@ -1557,7 +1557,7 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin, GenerationMixin, PushToHubMix
             logger.info(f"Model pushed to the hub in this commit: {url}")
 
     @classmethod
-    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, **kwargs):
+    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, tokenizer=None, **kwargs):
         r"""
         Instantiate a pretrained pytorch model from a pre-trained model configuration.
 
@@ -2022,7 +2022,7 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin, GenerationMixin, PushToHubMix
         else:
             with no_init_weights(_enable=_fast_init):
                 ### comment: step 5
-                model = cls(config, *model_args, **model_kwargs)
+                model = cls(config, *model_args,tokenizer=tokenizer, **model_kwargs)
 
         if from_tf:
             if resolved_archive_file.endswith(".index"):
