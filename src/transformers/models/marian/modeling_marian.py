@@ -666,33 +666,23 @@ class MarianEncoder(MarianPreTrainedModel):
             self.embed_tokens = embed_tokens
         else:
             self.embed_tokens = nn.Embedding(config.vocab_size, embed_dim, self.padding_idx)
-        self.use_debiased = kwargs['use_debiased']
-        if self.use_debiased:
-            print("using debiased embeddings")
-
-            new_embeddings = self.embed_tokens
-            weights = self.embed_tokens.weight.data.detach().clone()
-            # new_embeddings.weight.data = self.weights
-            # weights = weights.detach()
-            # old_num_tokens, old_embedding_dim = self.embed_tokens.weight.size()
-
-            # new_embeddings = nn.Embedding(old_num_tokens, old_embedding_dim, self.padding_idx, dtype=torch.float32)
-            # new_embeddings.to(self.embed_tokens.weight.device, dtype=self.embed_tokens.weight.dtype)
-            # self._init_weights(new_embeddings)
-
-            config_str = "{'USE_DEBIASED': 1, 'LANGUAGE': "+str(LANGUAGE_STR_TO_INT_MAP[tokenizer.target_lang])+", 'DEBIAS_METHOD': "+str(kwargs['debias_method'])+", 'TRANSLATION_MODEL': 1}"
-
-            debias_manager = DebiasManager.get_manager_instance(config_str,weights, tokenizer)
-            
-            
-                
-            new_embeddings.weight.data = Parameter(torch.from_numpy(debias_manager.debias_embedding_table()))
-            self.new_embeddings = new_embeddings.float()
-
-        else:
-            print("using non debiased embeddings")
-            self.new_embeddings = self.embed_tokens
-        # self.set_input_embeddings(new_embeddings)
+        # self.use_debiased = kwargs['use_debiased']
+        # if self.use_debiased:
+        #     print("using debiased embeddings")
+        # 
+        #     self.new_embeddings = copy.deepcopy(self.embed_tokens)
+        #     weights = self.embed_tokens.weight.data.detach().clone()
+        # 
+        #     config_str = "{'USE_DEBIASED': 1, 'LANGUAGE': "+str(LANGUAGE_STR_TO_INT_MAP[tokenizer.target_lang])+", 'DEBIAS_METHOD': "+str(kwargs['debias_method'])+", 'TRANSLATION_MODEL': 1}"
+        # 
+        #     debias_manager = DebiasManager.get_manager_instance(config_str,weights, tokenizer)
+        # 
+        #     self.new_embeddings.weight.data = Parameter(torch.from_numpy(debias_manager.debias_embedding_table()))
+        #     self.new_embeddings = self.new_embeddings.float()
+        #     self._init_weights(self.new_embeddings)
+        # else:
+        #     print("using non debiased embeddings")
+        #     self.new_embeddings = self.embed_tokens
 
         self.embed_positions = MarianSinusoidalPositionalEmbedding(
             config.max_position_embeddings, embed_dim, self.padding_idx
@@ -773,9 +763,9 @@ class MarianEncoder(MarianPreTrainedModel):
             raise ValueError("You have to specify either input_ids or inputs_embeds")
 
         ### comment: this is where i chenge the embedding table
-        if self.use_debiased:
-            # self.new_embeddings.weight.data = self.weights
-            self.set_input_embeddings(self.new_embeddings)
+        # if self.use_debiased:
+        #     # self.new_embeddings.weight.data = self.weights
+        #     self.set_input_embeddings(self.new_embeddings)
         if inputs_embeds is None:
 
             inputs_embeds = self.embed_tokens(input_ids) * self.embed_scale
