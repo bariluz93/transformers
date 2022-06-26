@@ -1475,6 +1475,7 @@ class MarianMTModel(MarianPreTrainedModel):
             output_hidden_states=output_hidden_states,
             return_dict=return_dict,
         )
+        ### comment: lm_logits is maybe the the output of the decoder before softmax. lm_logits.shape =[80, 1, 58101]
         lm_logits = self.lm_head(outputs[0]) + self.final_logits_bias
 
         masked_lm_loss = None
