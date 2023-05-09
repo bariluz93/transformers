@@ -44,9 +44,6 @@ from ...utils import (
 )
 from .configuration_marian import MarianConfig
 
-from torch.nn.parameter import Parameter
-from debias_files.debias_manager import DebiasManager
-from debias_files.consts import LANGUAGE_STR_TO_INT_MAP
 logger = logging.get_logger(__name__)
 
 _CONFIG_FOR_DOC = "MarianConfig"
