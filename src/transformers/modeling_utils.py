@@ -1557,7 +1557,7 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin, GenerationMixin, PushToHubMix
             logger.info(f"Model pushed to the hub in this commit: {url}")
 
     @classmethod
-    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, **kwargs):
+    def from_pretrained(cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, tokenizer=None, **kwargs):
         r"""
         Instantiate a pretrained pytorch model from a pre-trained model configuration.
 
@@ -2021,7 +2021,8 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin, GenerationMixin, PushToHubMix
                     model = cls(config, *model_args, **model_kwargs)
         else:
             with no_init_weights(_enable=_fast_init):
-                model = cls(config, *model_args, **model_kwargs)
+                ### comment: step 5
+                model = cls(config, *model_args,tokenizer=tokenizer, **model_kwargs)
 
         if from_tf:
             if resolved_archive_file.endswith(".index"):
@@ -2143,7 +2144,8 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin, GenerationMixin, PushToHubMix
         if cls._keys_to_ignore_on_load_unexpected is not None:
             for pat in cls._keys_to_ignore_on_load_unexpected:
                 unexpected_keys = [k for k in unexpected_keys if re.search(pat, k) is None]
-
+        # if 'model.encoder.new_embeddings.weight' in missing_keys:
+        #     missing_keys.remove('model.encoder.new_embeddings.weight')
         if _fast_init:
             # retrieve unintialized modules and initialize
             uninitialized_modules = model.retrieve_modules_from_names(
