@@ -833,8 +833,8 @@ class T5PreTrainedModel(PreTrainedModel):
 
 
 class T5Stack(T5PreTrainedModel):
-    def __init__(self, config, embed_tokens=None):
-        super().__init__(config)
+    def __init__(self, config,embed_tokens=None):
+        super().__init__(config, tokenizer=None)
 
         self.embed_tokens = embed_tokens
         self.is_decoder = config.is_decoder
@@ -1465,8 +1465,8 @@ class T5ForConditionalGeneration(T5PreTrainedModel):
         r"decoder\.block\.0\.layer\.1\.EncDecAttention\.relative_attention_bias\.weight",
     ]
 
-    def __init__(self, config: T5Config):
-        super().__init__(config)
+    def __init__(self, config: T5Config,tokenizer=None, **model_kwargs):
+        super().__init__(config, tokenizer=tokenizer, **model_kwargs)
         self.model_dim = config.d_model
 
         self.shared = nn.Embedding(config.vocab_size, config.d_model)

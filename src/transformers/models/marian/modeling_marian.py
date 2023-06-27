@@ -647,7 +647,7 @@ class MarianEncoder(MarianPreTrainedModel):
         embed_tokens (nn.Embedding): output embedding
     """
 
-    def __init__(self, config: MarianConfig, embed_tokens: Optional[nn.Embedding] = None,tokenizer=None, **kwargs):
+    def __init__(self, config: MarianConfig, embed_tokens: Optional[nn.Embedding] = None):
         super().__init__(config)
         ### comment: step 8
 
@@ -663,23 +663,6 @@ class MarianEncoder(MarianPreTrainedModel):
             self.embed_tokens = embed_tokens
         else:
             self.embed_tokens = nn.Embedding(config.vocab_size, embed_dim, self.padding_idx)
-        # self.use_debiased = kwargs['use_debiased']
-        # if self.use_debiased:
-        #     print("using debiased embeddings")
-        # 
-        #     self.new_embeddings = copy.deepcopy(self.embed_tokens)
-        #     weights = self.embed_tokens.weight.data.detach().clone()
-        # 
-        #     config_str = "{'USE_DEBIASED': 1, 'LANGUAGE': "+str(LANGUAGE_STR_TO_INT_MAP[tokenizer.target_lang])+", 'DEBIAS_METHOD': "+str(kwargs['debias_method'])+", 'TRANSLATION_MODEL': 1}"
-        # 
-        #     debias_manager = DebiasManager.get_manager_instance(config_str,weights, tokenizer)
-        # 
-        #     self.new_embeddings.weight.data = Parameter(torch.from_numpy(debias_manager.debias_embedding_table()))
-        #     self.new_embeddings = self.new_embeddings.float()
-        #     self._init_weights(self.new_embeddings)
-        # else:
-        #     print("using non debiased embeddings")
-        #     self.new_embeddings = self.embed_tokens
 
         self.embed_positions = MarianSinusoidalPositionalEmbedding(
             config.max_position_embeddings, embed_dim, self.padding_idx
@@ -1103,7 +1086,7 @@ class MarianDecoder(MarianPreTrainedModel):
     "The bare Marian Model outputting raw hidden-states without any specific head on top.", MARIAN_START_DOCSTRING
 )
 class MarianModel(MarianPreTrainedModel):
-    def __init__(self, config: MarianConfig,tokenizer=None, **kwargs):
+    def __init__(self, config: MarianConfig):
         super().__init__(config)
 
         padding_idx, vocab_size = config.pad_token_id, config.vocab_size
@@ -1120,7 +1103,7 @@ class MarianModel(MarianPreTrainedModel):
             self.shared = None
 
         ### comment: step 7
-        self.encoder = MarianEncoder(config, encoder_embed_tokens,tokenizer=tokenizer, **kwargs)
+        self.encoder = MarianEncoder(config, encoder_embed_tokens)
         self.decoder = MarianDecoder(config, decoder_embed_tokens)
 
         # Initialize weights and apply final processing
@@ -1299,10 +1282,10 @@ class MarianMTModel(MarianPreTrainedModel):
 
     _keys_to_ignore_on_save = ["model.encoder.embed_positions.weight", "model.decoder.embed_positions.weight"]
 
-    def __init__(self, config: MarianConfig, tokenizer=None, **kwargs):
+    def __init__(self, config: MarianConfig, **kwargs):
         super().__init__(config)
         ### comment: step 6
-        self.model = MarianModel(config,tokenizer=tokenizer, **kwargs)
+        self.model = MarianModel(config)
 
         target_vocab_size = config.vocab_size if config.share_encoder_decoder_embeddings else config.decoder_vocab_size
         self.register_buffer("final_logits_bias", torch.zeros((1, target_vocab_size)))
