@@ -450,7 +450,7 @@ class PretrainedConfig(PushToHubMixin):
             logger.info(f"Configuration pushed to the hub in this commit: {url}")
 
     @classmethod
-    def from_pretrained(cls, pretrained_model_name_or_path: Union[str, os.PathLike], **kwargs) -> "PretrainedConfig":
+    def from_pretrained(cls, pretrained_model_name_or_path: Union[str, os.PathLike], tokenizer=None, **kwargs) -> "PretrainedConfig":
         r"""
         Instantiate a [`PretrainedConfig`] (or a derived class) from a pretrained model configuration.
 

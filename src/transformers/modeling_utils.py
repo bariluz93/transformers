@@ -899,7 +899,7 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin, GenerationMixin, PushToHubMix
         """
         return "pt"
 
-    def __init__(self, config: PretrainedConfig, *inputs, **kwargs):
+    def __init__(self, config: PretrainedConfig,*inputs, tokenizer, **kwargs):
         super().__init__()
         if not isinstance(config, PretrainedConfig):
             raise ValueError(
