@@ -1263,8 +1263,8 @@ class MBartForConditionalGeneration(MBartPreTrainedModel):
         r"lm_head\.weight",
     ]
 
-    def __init__(self, config: MBartConfig):
-        super().__init__(config)
+    def __init__(self, config: MBartConfig,tokenizer=None):
+        super().__init__(config,tokenizer=tokenizer)
         self.model = MBartModel(config)
         self.register_buffer("final_logits_bias", torch.zeros((1, self.model.shared.num_embeddings)))
         self.lm_head = nn.Linear(config.d_model, self.model.shared.num_embeddings, bias=False)
